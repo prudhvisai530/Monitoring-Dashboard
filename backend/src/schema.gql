@@ -1,0 +1,14 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type MonitorType {
+  temperature: Float!
+  humidity: Float!
+  powerUsage: Float!
+  createdAt: String!
+}
+
+type Query {
+  getData: [MonitorType!]!
+}
