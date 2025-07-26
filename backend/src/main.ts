@@ -8,6 +8,7 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -31,7 +32,6 @@ function getRandomSensorData() {
 async function sendSensorData() {
   const data = getRandomSensorData();
   try {
-    console.log(data);
     const response = await axios.post(
       'http://localhost:3000/iotMonitor/data',
       data,

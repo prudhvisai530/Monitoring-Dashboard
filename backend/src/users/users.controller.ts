@@ -37,6 +37,7 @@ export class UserController {
     @Post('login')
     async login(@Body() body: { username: string; password: string }) {
         try {
+            this.logger.log(body.username, body.password)
             const user = await this.authService.validateUser(
                 body.username,
                 body.password,
