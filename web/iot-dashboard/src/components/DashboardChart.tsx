@@ -3,8 +3,11 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend
 } from 'recharts';
 import { getSensorData } from '../api/dashboard';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import {
+  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography
+} from '@mui/material';
 import { useAuth } from '../context/AuthContext';
+import io, { Socket } from 'socket.io-client';
 
 interface DataPoint {
   temperature: number;
@@ -13,9 +16,11 @@ interface DataPoint {
   createdAt: string;
 }
 
+const socket: Socket = io('http://localhost:3000'); // Adjust as needed
+
 const DashboardChart: React.FC = () => {
+  const role = localStorage.getItem('role')
   const { token } = useAuth();
-  const role = localStorage.getItem('role') ?? '';
   const [data, setData] = useState<DataPoint[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -28,11 +33,9 @@ const DashboardChart: React.FC = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async () => {
@@ -54,33 +57,30 @@ const DashboardChart: React.FC = () => {
 
       alert("Record added successfully");
       handleClose();
+      fetchData(selectedDate || undefined); // Refresh data
     } catch (error) {
       console.error(error);
       alert("Error adding record");
     }
   };
 
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async (date?: string) => {
     try {
-      // Make sure token is stored at login
-      const response = await getSensorData(token, date)
-      const fetchedData = selectedDate ? response.data.data.getDataByDate : response.data.data.getData;
+      const response = await getSensorData(token, date);
+      const fetchedData = selectedDate
+        ? response.data.data.getDataByDate
+        : response.data.data.getData;
 
       const processedData = [...fetchedData].map((item: any) => ({
         ...item,
-        createdAt: new Date(Number(item.createdAt)).toLocaleString(), // Or use toISOString()
-      })).sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
+        createdAt: isNaN(Number(item.createdAt))
+          ? item.createdAt
+          : new Date(Number(item.createdAt)).toISOString(),
+      }));
 
       setData(processedData);
     } catch (error) {
-      setData([])
+      setData([]);
       console.error('Error fetching data', error);
     }
   };
@@ -89,17 +89,34 @@ const DashboardChart: React.FC = () => {
     fetchData(selectedDate || undefined);
   }, [selectedDate]);
 
+  useEffect(() => {
+    socket.on('iotData', (newData: DataPoint) => {
+      setData(prev => [
+        ...prev,
+        {
+          ...newData,
+          createdAt: isNaN(Number(newData.createdAt))
+            ? newData.createdAt
+            : new Date(Number(newData.createdAt)).toISOString(),
+        },
+      ]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.value;
     setSelectedDate(selected || null);
   };
 
-
   return (
     <Box sx={{ width: '100%', height: 400 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">Historical Sensor Data</Typography>
-        <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
+        <Box display="flex" alignItems="center" gap={2}>
           <Box display="flex" alignItems="center">
             <Typography variant="body1" component="label" sx={{ mr: 1 }}>
               Select Date:
@@ -123,6 +140,7 @@ const DashboardChart: React.FC = () => {
         </Box>
       </Box>
 
+      {/* Dialog for Adding Record */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Record</DialogTitle>
         <DialogContent>
@@ -156,28 +174,41 @@ const DashboardChart: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={!formData.powerUsage || !formData.humidity || !formData.temperature}>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            disabled={!formData.temperature || !formData.humidity || !formData.powerUsage}
+          >
             Submit
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Chart or No Data */}
       {data.length === 0 ? (
         <Box sx={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="subtitle1" color="textSecondary">
             No data available for the selected date.
           </Typography>
-          {/* Or use this if you prefer alert:
-        <Alert severity="info">No data available for the selected date.</Alert>
-        */}
         </Box>
       ) : (
         <ResponsiveContainer>
           <LineChart data={data}>
             <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="createdAt" tickFormatter={(tick) => new Date(tick).toLocaleTimeString()} />
+            <XAxis
+              dataKey="createdAt"
+              tickFormatter={(tick) => new Date(tick).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            />
             <YAxis />
-            <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} />
+            <Tooltip
+              labelFormatter={(label) =>
+                new Date(label).toLocaleString(undefined, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                })
+              }
+            />
             <Legend />
             <Line type="monotone" dataKey="temperature" stroke="#ff7300" name="Temperature (°C)" />
             <Line type="monotone" dataKey="humidity" stroke="#387908" name="Humidity (%)" />
@@ -187,6 +218,6 @@ const DashboardChart: React.FC = () => {
       )}
     </Box>
   );
-}
+};
 
 export default DashboardChart;

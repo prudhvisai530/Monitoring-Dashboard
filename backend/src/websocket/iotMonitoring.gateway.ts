@@ -1,4 +1,3 @@
-// sensor.gateway.ts
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -7,9 +6,15 @@ import {
 import { Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: 'http://localhost:5173',
+    credentials: true,
+  },
+})
 export class MonitorGateway implements OnGatewayConnection {
   private readonly logger = new Logger(MonitorGateway.name);
+
   @WebSocketServer()
   server: Server;
 

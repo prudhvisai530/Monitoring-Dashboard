@@ -9,7 +9,10 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -23,9 +26,9 @@ async function bootstrap() {
 }
 function getRandomSensorData() {
   return {
-    temperature: Number((Math.random() * 30 + 10).toFixed(2)), // 10°C to 40°C
-    humidity: Number((Math.random() * 50 + 30).toFixed(2)), // 30% to 80%
-    powerUsage: Number((Math.random() * 500 + 100).toFixed(2)), // 100W to 600W
+    temperature: Number((Math.random() * 30 + 10).toFixed(2)),
+    humidity: Number((Math.random() * 50 + 30).toFixed(2)),
+    powerUsage: Number((Math.random() * 500 + 100).toFixed(2)),
   };
 }
 
@@ -48,5 +51,5 @@ async function sendSensorData() {
   }
 }
 
-setInterval(sendSensorData, 300000);
+setInterval(sendSensorData, 60 * 60 * 1000);
 bootstrap();
