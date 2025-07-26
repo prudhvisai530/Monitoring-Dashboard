@@ -16,7 +16,7 @@ export class IotMonitorService {
   constructor(
     @InjectModel(Monitor.name) private monitorModel: Model<Monitor>,
     private readonly sensorGateway: MonitorGateway,
-  ) {}
+  ) { }
 
   async create(data: CreateIotMonitoringDto): Promise<Monitor> {
     this.logger.log(`Creating new data: ${JSON.stringify(data)}`);
@@ -41,5 +41,18 @@ export class IotMonitorService {
       this.logger.error('Error fetching data', error.stack);
       throw new InternalServerErrorException('Failed to fetch data');
     }
+  }
+
+  async findByDate(dateString: string): Promise<any[]> {
+    const date = new Date(dateString);
+    const nextDay = new Date(date);
+    nextDay.setDate(date.getDate() + 1);
+
+    return this.monitorModel.find({
+      createdAt: {
+        $gte: date,
+        $lt: nextDay,
+      },
+    }).exec();
   }
 }

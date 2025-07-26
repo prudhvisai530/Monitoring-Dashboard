@@ -11,4 +11,5 @@ type MonitorType {
 
 type Query {
   getData: [MonitorType!]!
+  getDataByDate(date: String!): [MonitorType!]!
 }

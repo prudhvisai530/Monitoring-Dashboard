@@ -3,14 +3,15 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Monitor extends Document {
-  @Prop()
+  @Prop({ required: true })
   temperature: number;
 
-  @Prop()
+  @Prop({ required: true })
   humidity: number;
 
-  @Prop()
+  @Prop({ required: true })
   powerUsage: number;
+
 }
 
 export const IotMonitoringSchema = SchemaFactory.createForClass(Monitor);
