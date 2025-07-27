@@ -6,8 +6,8 @@ export const loginUser = async (data: { username: string; password: string }) =>
     const response = await axios.post(`${BASE_URL}/login`, data);
     const { access_token, role } = response.data;
 
-    localStorage.setItem('token', access_token);
-    localStorage.setItem('role', role);
+    sessionStorage.setItem('token', access_token);
+    sessionStorage.setItem('role', role);
 
     return response.data;
 };

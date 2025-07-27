@@ -10,6 +10,8 @@ import { UserService } from './users.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { AuthService } from '../auth/auth.service';
 import { Logger } from '@nestjs/common';
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
 
 @Controller('users')
 export class UserController {
@@ -37,7 +39,6 @@ export class UserController {
     @Post('login')
     async login(@Body() body: { username: string; password: string }) {
         try {
-            this.logger.log(body.username, body.password)
             const user = await this.authService.validateUser(
                 body.username,
                 body.password,
@@ -45,7 +46,16 @@ export class UserController {
             if (!user) {
                 throw new BadRequestException('Invalid username or password');
             }
-            return this.authService.login(user);
+            const result = await this.authService.login(user);
+
+            const accessToken = result?.access_token;
+
+            if (accessToken) {
+                const filePath = join(__dirname, '../../access_token.txt');
+                await writeFile(filePath, accessToken, { encoding: 'utf8' });
+                this.logger.log(`Access token written to ${filePath}`);
+            }
+            return result
         } catch (error) {
             if (error instanceof HttpException) {
                 throw error;
