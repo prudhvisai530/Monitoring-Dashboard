@@ -13,11 +13,10 @@ interface AppProps {
   mode: 'light' | 'dark';
 }
 
-// Lazy-loaded route components
 const Login = lazy(() => import('./components/auth/Login'));
 const Signup = lazy(() => import('./components/auth/SignUp'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-// const NotFound = lazy(() => import('./pages/NotFound')); // optional 404 route
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const App: React.FC<AppProps> = ({ toggleMode, mode }) => {
   const { token, setToken } = useAuth();
@@ -50,7 +49,7 @@ const App: React.FC<AppProps> = ({ toggleMode, mode }) => {
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
-          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route path="*" element={<NotFound />} />s
         </Routes>
       </Suspense>
     </BrowserRouter>

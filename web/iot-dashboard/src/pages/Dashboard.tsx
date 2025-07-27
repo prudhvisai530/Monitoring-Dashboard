@@ -5,8 +5,8 @@ import DashboardChart from '../components/DashboardChart';
 const Dashboard: React.FC = () => {
 
     return (
-        <Container sx={{ mt: 5 }}>
-            <Typography variant="h4" gutterBottom>
+        <Container sx={{ mt: 3 }}>
+            <Typography variant="h3" gutterBottom align="center" sx={{ mtb: 2 }}>
                 Welcome to Dashboard
             </Typography>
             <DashboardChart />
