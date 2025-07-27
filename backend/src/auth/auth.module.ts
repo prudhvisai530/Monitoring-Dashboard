@@ -9,7 +9,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: 'your_jwt_secret',
+      secret: process.env.SECRET,
       signOptions: { expiresIn: '1h' },
     }),
     forwardRef(() => UsersModule),
@@ -17,4 +17,4 @@ import { UsersModule } from '../users/users.module';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService, JwtModule],
 })
-export class AuthModule {}
+export class AuthModule { }
