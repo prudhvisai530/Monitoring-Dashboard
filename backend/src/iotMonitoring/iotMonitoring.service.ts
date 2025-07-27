@@ -38,7 +38,7 @@ export class IotMonitorService {
       this.logger.log('Data fetched successfully');
       return response;
     } catch (error) {
-      this.logger.error('Error fetching data', error.stack);
+      this.logger.error('Error fetching data');
       throw new InternalServerErrorException('Failed to fetch data');
     }
   }

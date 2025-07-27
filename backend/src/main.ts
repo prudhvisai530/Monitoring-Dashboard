@@ -36,7 +36,7 @@ function getRandomSensorData() {
 
 function readAccessToken(): string | null {
   try {
-    const tokenPath = path.resolve(__dirname, '../access_token.txt'); // adjust if needed
+    const tokenPath = path.resolve(__dirname, '../access_token.txt');
     return fs.readFileSync(tokenPath, 'utf-8').trim();
   } catch (err) {
     console.error('Error reading access_token:', err.message);

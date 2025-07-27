@@ -5,7 +5,6 @@ import { Monitor } from './schemas/iotMonitoring.schema';
 import { MonitorGateway } from '../websocket/iotMonitoring.gateway';
 import { InternalServerErrorException } from '@nestjs/common';
 
-// Sample DTO
 const mockDto = {
   temperature: 45,
   humidity: 20,

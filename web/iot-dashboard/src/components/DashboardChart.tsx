@@ -16,7 +16,7 @@ interface DataPoint {
   createdAt: string;
 }
 
-const socket: Socket = io('http://localhost:3000'); // Adjust as needed
+const socket: Socket = io('http://localhost:3000');
 
 const DashboardChart: React.FC = () => {
   const role = sessionStorage.getItem('role')
@@ -140,8 +140,11 @@ const DashboardChart: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Dialog for Adding Record */}
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={(event, reason) => {
+        if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+          handleClose();
+        }
+      }}>
         <DialogTitle>Add New Record</DialogTitle>
         <DialogContent>
           <TextField
@@ -184,7 +187,6 @@ const DashboardChart: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Chart or No Data */}
       {data.length === 0 ? (
         <Box sx={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="subtitle1" color="textSecondary">

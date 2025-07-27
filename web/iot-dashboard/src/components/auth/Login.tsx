@@ -8,12 +8,9 @@ import {
     Paper,
     Alert
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../../api/auth';
 import type { LogoutButtonProps } from '../../interface/logoutPros';
-
-
-
 
 const Login: React.FC<LogoutButtonProps> = ({ isToken }) => {
     const [userName, setUserName] = useState('');
@@ -83,7 +80,7 @@ const Login: React.FC<LogoutButtonProps> = ({ isToken }) => {
 
                 <Box mt={2}>
                     <Typography variant="body2">
-                        Don't have an account? <a href="/signup">Sign up</a>
+                        Don't have an account? <Link to="/signup">Sign up</Link>
                     </Typography>
                 </Box>
             </Paper>

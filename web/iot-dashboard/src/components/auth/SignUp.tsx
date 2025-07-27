@@ -12,7 +12,7 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { signupUser } from '../../api/auth';
 
 const Signup: React.FC = () => {
@@ -90,7 +90,7 @@ const Signup: React.FC = () => {
 
                 <Box mt={2}>
                     <Typography variant="body2">
-                        Already have an account? <a href="/login">Login</a>
+                        Already have an account? <Link to="/login">Log In</Link>
                     </Typography>
                 </Box>
             </Paper>
