@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import axios from 'axios';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as path from 'path';
 
 dotenv.config();
 
@@ -32,6 +34,17 @@ function getRandomSensorData() {
   };
 }
 
+function readAccessToken(): string | null {
+  try {
+    const tokenPath = path.resolve(__dirname, '../access_token.txt'); // adjust if needed
+    return fs.readFileSync(tokenPath, 'utf-8').trim();
+  } catch (err) {
+    console.error('Error reading access_token:', err.message);
+    return null;
+  }
+}
+
+
 async function sendSensorData() {
   const data = getRandomSensorData();
   try {
@@ -40,7 +53,7 @@ async function sendSensorData() {
       data,
       {
         headers: {
-          Authorization: `Bearer ${process.env.TOKEN}`,
+          Authorization: `Bearer ${readAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },

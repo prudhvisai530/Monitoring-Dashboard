@@ -19,7 +19,7 @@ interface DataPoint {
 const socket: Socket = io('http://localhost:3000'); // Adjust as needed
 
 const DashboardChart: React.FC = () => {
-  const role = localStorage.getItem('role')
+  const role = sessionStorage.getItem('role')
   const { token } = useAuth();
   const [data, setData] = useState<DataPoint[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);

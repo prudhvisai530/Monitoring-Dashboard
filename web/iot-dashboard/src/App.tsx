@@ -36,7 +36,6 @@ const App: React.FC<AppProps> = ({ toggleMode, mode }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Suspense fallback while lazy components load */}
       <Suspense
         fallback={
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>

@@ -7,7 +7,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({ isToken }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     isToken(null)
     navigate('/login');
   };
